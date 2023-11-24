@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "528824553476",
+    "project_id": "flutter-order-app-d84f8",
+    "storage_bucket": "flutter-order-app-d84f8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:528824553476:android:9a490df260de0eae106551",
+        "android_client_info": {
+          "package_name": "com.example.admin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQoXULxttawZH6VWsos8Fx22KDjbBmO8I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
