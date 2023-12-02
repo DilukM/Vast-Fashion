@@ -1,5 +1,4 @@
 import 'package:admin/screens/Customer/account_page.dart';
-import 'package:admin/screens/admin/admin_page.dart';
 import 'package:admin/screens/Customer/cart_page.dart';
 import 'package:admin/screens/Customer/order_page.dart';
 import 'package:admin/screens/Customer/product_page.dart';
@@ -30,7 +29,10 @@ class HomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             IconButton(
-              icon: const Icon(Icons.home),
+              icon: const Icon(
+                Icons.home,
+                color: Color.fromARGB(255, 12, 113, 51),
+              ),
               onPressed: () {
                 // Navigate to home
                 Navigator.push(
@@ -42,7 +44,10 @@ class HomePage extends StatelessWidget {
               },
             ),
             IconButton(
-              icon: const Icon(Icons.assignment),
+              icon: const Icon(
+                Icons.assignment,
+                color: Color.fromARGB(255, 12, 113, 51),
+              ),
               onPressed: () {
                 // Navigate to orders
                 Navigator.push(
@@ -54,7 +59,10 @@ class HomePage extends StatelessWidget {
               },
             ),
             IconButton(
-              icon: const Icon(Icons.shopping_cart),
+              icon: const Icon(
+                Icons.shopping_cart,
+                color: Color.fromARGB(255, 12, 113, 51),
+              ),
               onPressed: () {
                 // Navigate to cart page
                 Navigator.push(
@@ -66,7 +74,10 @@ class HomePage extends StatelessWidget {
               },
             ),
             IconButton(
-              icon: const Icon(Icons.account_circle),
+              icon: const Icon(
+                Icons.account_circle,
+                color: Color.fromARGB(255, 12, 113, 51),
+              ),
               onPressed: () {
                 // Navigate to account
                 Navigator.push(

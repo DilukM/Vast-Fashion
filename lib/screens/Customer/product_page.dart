@@ -1,5 +1,4 @@
 import 'package:admin/screens/Customer/account_page.dart';
-import 'package:admin/screens/admin/admin_page.dart';
 import 'package:admin/screens/Customer/cart_page.dart';
 import 'package:admin/screens/Customer/home_screen.dart';
 import 'package:admin/screens/Customer/order_page.dart';

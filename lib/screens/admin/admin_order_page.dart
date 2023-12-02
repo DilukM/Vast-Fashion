@@ -1,18 +1,21 @@
 import 'package:admin/screens/Customer/account_page.dart';
 import 'package:admin/screens/Customer/cart_page.dart';
 import 'package:admin/screens/Customer/home_screen.dart';
+import 'package:admin/screens/admin/admin_account_page.dart';
+import 'package:admin/screens/admin/admin_analytics_page.dart';
+import 'package:admin/screens/admin/admin_product_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class OrderPage extends StatefulWidget {
-  const OrderPage({Key? key}) : super(key: key);
+class OrdersTab extends StatefulWidget {
+  const OrdersTab({Key? key}) : super(key: key);
 
   @override
-  State<OrderPage> createState() => _OrderPageState();
+  State<OrdersTab> createState() => _OrdersTabState();
 }
 
-class _OrderPageState extends State<OrderPage>
+class _OrdersTabState extends State<OrdersTab>
     with SingleTickerProviderStateMixin {
   String? userId;
   TabController? _tabController;
@@ -57,7 +60,7 @@ class _OrderPageState extends State<OrderPage>
           children: [
             IconButton(
               icon: const Icon(
-                Icons.home,
+                Icons.analytics,
                 color: Color.fromARGB(255, 12, 113, 51),
               ),
               onPressed: () {
@@ -65,7 +68,22 @@ class _OrderPageState extends State<OrderPage>
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => HomePage(),
+                    builder: (context) => const AnalyticsTab(),
+                  ),
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.shopping_basket,
+                color: Color.fromARGB(255, 12, 113, 51),
+              ),
+              onPressed: () {
+                // Navigate to orders
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProductsTab(),
                   ),
                 );
               },
@@ -76,20 +94,11 @@ class _OrderPageState extends State<OrderPage>
                 color: Color.fromARGB(255, 12, 113, 51),
               ),
               onPressed: () {
-                // You are already on the orders page, so no need to navigate
-              },
-            ),
-            IconButton(
-              icon: const Icon(
-                Icons.shopping_cart,
-                color: Color.fromARGB(255, 12, 113, 51),
-              ),
-              onPressed: () {
                 // Navigate to cart page
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => CartPage(),
+                    builder: (context) => const OrdersTab(),
                   ),
                 );
               },
@@ -104,7 +113,7 @@ class _OrderPageState extends State<OrderPage>
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AccountPage(),
+                    builder: (context) => const AccountTab(),
                   ),
                 );
               },
@@ -119,7 +128,6 @@ class _OrderPageState extends State<OrderPage>
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection('orders')
-          .where('userId', isEqualTo: userId)
           .where('status', isEqualTo: status)
           .snapshots(),
       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -176,21 +184,81 @@ class _OrderCardState extends State<OrderCard> {
 
   @override
   Widget build(BuildContext context) {
+    var shippingDetails =
+        widget.order['shippingDetails'] as Map<String, dynamic>;
     var orderStatus = widget.order['status'] ?? 'Pending';
 
-    return Card(
-      margin: EdgeInsets.all(8.0),
-      child: ListTile(
-        title: Text('Order Status: $orderStatus'),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (products != null)
-              for (var product in products!)
-                Text('Product Name: ${product['productName']}'),
-            // Add other product details as needed
-          ],
+    return GestureDetector(
+      onTap: () {
+        // Navigate to a new page to display details
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OrderDetailsPage(order: widget.order),
+          ),
+        );
+      },
+      child: Card(
+        margin: EdgeInsets.all(8.0),
+        child: ListTile(
+          title: Text('${shippingDetails?['contactName'] ?? 'Unknown'}'),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (products != null)
+                for (var product in products!)
+                  Text(' ${product['productName']}'),
+              // Add other product details as needed
+            ],
+          ),
         ),
+      ),
+    );
+  }
+}
+
+class OrderDetailsPage extends StatelessWidget {
+  final DocumentSnapshot order;
+
+  const OrderDetailsPage({Key? key, required this.order}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var shippingDetails = order['shippingDetails'] as Map<String, dynamic>;
+    var productsCollection = order.reference.collection('products');
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Order Details'),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Contact Name: ${shippingDetails?['contactName'] ?? 'Unknown'}'),
+          Text(
+              'Contact Number: ${shippingDetails?['phoneNumber'] ?? 'Unknown'}'),
+          Text(
+              'Address: ${shippingDetails?['house'] ?? ''} ${shippingDetails?['street'] ?? ''}, ${shippingDetails?['city'] ?? ''}, ${shippingDetails?['zip'] ?? ''}'),
+          FutureBuilder(
+            future: productsCollection.get(),
+            builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              }
+
+              var products = snapshot.data?.docs ?? [];
+
+              return Column(
+                children: [
+                  Text('Products:'),
+                  for (var product in products)
+                    Text('${product['productName']}'),
+                ],
+              );
+            },
+          ),
+          // Add other details as needed
+        ],
       ),
     );
   }

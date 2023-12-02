@@ -1,7 +1,7 @@
 import 'package:admin/screens/Customer/account_page.dart';
-import 'package:admin/screens/admin/admin_page.dart';
 import 'package:admin/screens/Customer/home_screen.dart';
 import 'package:admin/screens/Customer/order_page.dart';
+import 'package:admin/screens/Customer/shipping.dart';
 import 'package:admin/screens/Customer/shipping_details.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -28,7 +28,10 @@ class CartPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             IconButton(
-              icon: const Icon(Icons.home),
+              icon: const Icon(
+                Icons.home,
+                color: Color.fromARGB(255, 12, 113, 51),
+              ),
               onPressed: () {
                 // Navigate to home
                 Navigator.push(
@@ -40,7 +43,10 @@ class CartPage extends StatelessWidget {
               },
             ),
             IconButton(
-              icon: const Icon(Icons.assignment),
+              icon: const Icon(
+                Icons.assignment,
+                color: Color.fromARGB(255, 12, 113, 51),
+              ),
               onPressed: () {
                 // Navigate to orders
                 Navigator.push(
@@ -52,7 +58,10 @@ class CartPage extends StatelessWidget {
               },
             ),
             IconButton(
-              icon: const Icon(Icons.shopping_cart),
+              icon: const Icon(
+                Icons.shopping_cart,
+                color: Color.fromARGB(255, 12, 113, 51),
+              ),
               onPressed: () {
                 // Navigate to cart page
                 Navigator.push(
@@ -64,7 +73,10 @@ class CartPage extends StatelessWidget {
               },
             ),
             IconButton(
-              icon: const Icon(Icons.account_circle),
+              icon: const Icon(
+                Icons.account_circle,
+                color: Color.fromARGB(255, 12, 113, 51),
+              ),
               onPressed: () {
                 // Navigate to account
                 Navigator.push(
@@ -171,7 +183,7 @@ class CartItemList extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            ShippingDetailsPage(userId: userId),
+                            ViewShippingDetailsPage(userId: userId),
                       ),
                     );
                   },

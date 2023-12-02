@@ -1,19 +1,17 @@
-import 'package:admin/screens/Customer/cart_page.dart';
-import 'package:admin/screens/Customer/home_screen.dart';
-import 'package:admin/screens/Customer/order_page.dart';
+import 'package:admin/screens/admin/admin_analytics_page.dart';
+import 'package:admin/screens/admin/admin_order_page.dart';
+import 'package:admin/screens/admin/admin_product_page.dart';
 import 'package:flutter/material.dart';
 
-class AccountPage extends StatefulWidget {
-  const AccountPage({super.key});
+class AccountTab extends StatelessWidget {
+  const AccountTab({Key? key}) : super(key: key);
 
-  @override
-  State<AccountPage> createState() => _AccountPageState();
-}
-
-class _AccountPageState extends State<AccountPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(''),
+      ),
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
         child: Row(
@@ -21,7 +19,7 @@ class _AccountPageState extends State<AccountPage> {
           children: [
             IconButton(
               icon: const Icon(
-                Icons.home,
+                Icons.analytics,
                 color: Color.fromARGB(255, 12, 113, 51),
               ),
               onPressed: () {
@@ -29,7 +27,22 @@ class _AccountPageState extends State<AccountPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const HomePage(),
+                    builder: (context) => const AnalyticsTab(),
+                  ),
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.shopping_basket,
+                color: Color.fromARGB(255, 12, 113, 51),
+              ),
+              onPressed: () {
+                // Navigate to orders
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProductsTab(),
                   ),
                 );
               },
@@ -40,26 +53,11 @@ class _AccountPageState extends State<AccountPage> {
                 color: Color.fromARGB(255, 12, 113, 51),
               ),
               onPressed: () {
-                // Navigate to orders
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const OrderPage(),
-                  ),
-                );
-              },
-            ),
-            IconButton(
-              icon: const Icon(
-                Icons.shopping_cart,
-                color: Color.fromARGB(255, 12, 113, 51),
-              ),
-              onPressed: () {
                 // Navigate to cart page
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => CartPage(),
+                    builder: (context) => OrdersTab(),
                   ),
                 );
               },
@@ -74,7 +72,7 @@ class _AccountPageState extends State<AccountPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const AccountPage(),
+                    builder: (context) => const AccountTab(),
                   ),
                 );
               },

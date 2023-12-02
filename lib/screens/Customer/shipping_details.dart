@@ -1,5 +1,4 @@
 import 'package:admin/screens/Customer/account_page.dart';
-import 'package:admin/screens/admin/admin_page.dart';
 import 'package:admin/screens/Customer/cart_page.dart';
 import 'package:admin/screens/Customer/home_screen.dart';
 import 'package:admin/screens/Customer/order_page.dart';
@@ -22,6 +21,13 @@ class _ShippingDetailsPageState extends State<ShippingDetailsPage> {
   TextEditingController streetController = TextEditingController();
   TextEditingController cityController = TextEditingController();
   TextEditingController zipController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch existing shipping details if they exist
+    fetchExistingShippingDetails();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,8 +80,8 @@ class _ShippingDetailsPageState extends State<ShippingDetailsPage> {
                     backgroundColor: Color.fromARGB(255, 5, 129, 44),
                   ),
                   onPressed: () {
-                    // Save shipping details to Firestore
-                    saveShippingDetails();
+                    // Save or update shipping details to Firestore
+                    saveOrUpdateShippingDetails();
                     // You can also implement payment processing logic here
                   },
                   child: Text('Save and Proceed to Pay'),
@@ -144,20 +150,53 @@ class _ShippingDetailsPageState extends State<ShippingDetailsPage> {
     );
   }
 
-  void saveShippingDetails() {
-    // Save shipping details to Firestore
-    FirebaseFirestore.instance
+  void fetchExistingShippingDetails() async {
+    try {
+      // Fetch existing shipping details from Firestore
+      DocumentSnapshot shippingDetailsDocument = await FirebaseFirestore
+          .instance
+          .collection('users')
+          .doc(widget.userId)
+          .collection('shippingDetails')
+          .doc('user_shipping_details') // Assuming a single document for user
+          .get();
+
+      if (shippingDetailsDocument.exists) {
+        // Update text controllers with existing values
+        Map<String, dynamic> data =
+            shippingDetailsDocument.data() as Map<String, dynamic>;
+        setState(() {
+          nameController.text = data['contactName'];
+          phoneNumberController.text = data['phoneNumber'];
+          houseController.text = data['house'];
+          streetController.text = data['street'];
+          cityController.text = data['city'];
+          zipController.text = data['zip'];
+        });
+      }
+    } catch (error) {
+      print('Error fetching existing shipping details: $error');
+    }
+  }
+
+  void saveOrUpdateShippingDetails() async {
+    // Check if shipping details document already exists
+    DocumentReference shippingDetailsRef = FirebaseFirestore.instance
         .collection('users')
         .doc(widget.userId)
         .collection('shippingDetails')
-        .add({
+        .doc('user_shipping_details');
+
+    bool shippingDetailsExist = (await shippingDetailsRef.get()).exists;
+
+    // Save or update shipping details to Firestore
+    await shippingDetailsRef.set({
       'contactName': nameController.text,
       'phoneNumber': phoneNumberController.text,
       'house': houseController.text,
       'street': streetController.text,
       'city': cityController.text,
       'zip': zipController.text,
-      // Add more details if needed
     });
 
     // Navigate back to the cart or another page
