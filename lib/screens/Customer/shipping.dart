@@ -1,8 +1,13 @@
+import 'package:admin/screens/Customer/NewUserShippingDetailsPage.dart';
+import 'package:admin/screens/Customer/account_page.dart';
+import 'package:admin/screens/Customer/cart_page.dart';
 import 'package:admin/screens/Customer/home_screen.dart';
+import 'package:admin/screens/Customer/order_page.dart';
 import 'package:admin/screens/Customer/payment_method.dart';
 import 'package:admin/screens/Customer/shipping_details.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:badges/badges.dart' as badges;
 
 class ViewShippingDetailsPage extends StatefulWidget {
   final String userId;
@@ -25,9 +30,82 @@ class _ViewShippingDetailsPageState extends State<ViewShippingDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    var cartItemCount = 0;
     return Scaffold(
       appBar: AppBar(
         title: Text('Shipping Details'),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        shape: const CircularNotchedRectangle(),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            IconButton(
+              icon: const Icon(
+                Icons.home,
+                color: Color.fromARGB(255, 12, 113, 51),
+              ),
+              onPressed: () {
+                // Navigate to home
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HomePage(),
+                  ),
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.assignment,
+                color: Color.fromARGB(255, 12, 113, 51),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => OrderPage(),
+                  ),
+                );
+              },
+            ),
+            badges.Badge(
+              position: badges.BadgePosition.topEnd(top: 0, end: 3),
+              badgeContent: Text(
+                cartItemCount.toString(),
+                style: TextStyle(color: Colors.white),
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.shopping_cart,
+                    color: Color.fromARGB(255, 12, 113, 51)),
+                onPressed: () {
+                  // Navigate to cart page
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CartPage(),
+                    ),
+                  );
+                },
+              ),
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.account_circle,
+                color: Color.fromARGB(255, 12, 113, 51),
+              ),
+              onPressed: () {
+                // Navigate to account
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AccountPage(),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
@@ -46,10 +124,31 @@ class _ViewShippingDetailsPageState extends State<ViewShippingDetailsPage> {
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return Center(
-                child: Text('No shipping details found for the user.'));
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('No Shipping Address Available'),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              NewUserShippingDetailsPage(userId: userId),
+                        ),
+                      );
+                    },
+                    child: Text('Add Shipping Address'),
+                  ),
+                ],
+              ),
+            );
           }
 
-          // Take the first document
+          // Take the first document if available
           DocumentSnapshot firstDocument = snapshot.data!.docs.first;
           Map<String, dynamic> data =
               firstDocument.data() as Map<String, dynamic>;
@@ -58,7 +157,7 @@ class _ViewShippingDetailsPageState extends State<ViewShippingDetailsPage> {
             padding: const EdgeInsets.all(16.0),
             child: SingleChildScrollView(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text('Contact Name: ${data['contactName']}'),
                   SizedBox(height: 16),
@@ -76,6 +175,10 @@ class _ViewShippingDetailsPageState extends State<ViewShippingDetailsPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Color.fromARGB(255, 5, 129, 44),
+                        ),
                         onPressed: () {
                           // Confirm the address
                           Navigator.push(
@@ -88,6 +191,10 @@ class _ViewShippingDetailsPageState extends State<ViewShippingDetailsPage> {
                         child: Text('Confirm Address'),
                       ),
                       ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Color.fromARGB(255, 5, 129, 44),
+                        ),
                         onPressed: () {
                           Navigator.push(
                             context,

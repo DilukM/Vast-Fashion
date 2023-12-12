@@ -4,6 +4,7 @@ import 'package:admin/screens/Customer/home_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:badges/badges.dart' as badges;
 
 class OrderPage extends StatefulWidget {
   const OrderPage({Key? key}) : super(key: key);
@@ -28,6 +29,7 @@ class _OrderPageState extends State<OrderPage>
 
   @override
   Widget build(BuildContext context) {
+    var cartItemCount = 0;
     return Scaffold(
       appBar: AppBar(
         title: Text('My Orders'),
@@ -79,20 +81,25 @@ class _OrderPageState extends State<OrderPage>
                 // You are already on the orders page, so no need to navigate
               },
             ),
-            IconButton(
-              icon: const Icon(
-                Icons.shopping_cart,
-                color: Color.fromARGB(255, 12, 113, 51),
+            badges.Badge(
+              position: badges.BadgePosition.topEnd(top: 0, end: 3),
+              badgeContent: Text(
+                cartItemCount.toString(),
+                style: TextStyle(color: Colors.white),
               ),
-              onPressed: () {
-                // Navigate to cart page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CartPage(),
-                  ),
-                );
-              },
+              child: IconButton(
+                icon: const Icon(Icons.shopping_cart,
+                    color: Color.fromARGB(255, 12, 113, 51)),
+                onPressed: () {
+                  // Navigate to cart page
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CartPage(),
+                    ),
+                  );
+                },
+              ),
             ),
             IconButton(
               icon: const Icon(
@@ -129,13 +136,13 @@ class _OrderPageState extends State<OrderPage>
           );
         }
 
-        var orders = snapshot.data?.docs ?? [];
+        var products = snapshot.data?.docs ?? [];
 
         return ListView.builder(
-          itemCount: orders.length,
+          itemCount: products.length,
           itemBuilder: (context, index) {
-            var order = orders[index];
-            return OrderCard(order: order);
+            var product = products[index];
+            return OrderCard(product: product);
           },
         );
       },
@@ -143,51 +150,33 @@ class _OrderPageState extends State<OrderPage>
   }
 }
 
-class OrderCard extends StatefulWidget {
-  final DocumentSnapshot order;
+class OrderCard extends StatelessWidget {
+  final QueryDocumentSnapshot product;
 
-  const OrderCard({Key? key, required this.order}) : super(key: key);
-
-  @override
-  _OrderCardState createState() => _OrderCardState();
-}
-
-class _OrderCardState extends State<OrderCard> {
-  List<Map<String, dynamic>>? products;
-
-  @override
-  void initState() {
-    super.initState();
-    // Fetch the 'products' collection for the order
-    fetchProducts();
-  }
-
-  void fetchProducts() async {
-    var order = widget.order;
-    var productsCollection = await order.reference.collection('products').get();
-
-    setState(() {
-      // Convert each product document to a map and store in the products list
-      products = productsCollection.docs
-          .map((product) => product.data() as Map<String, dynamic>)
-          .toList();
-    });
-  }
+  const OrderCard({Key? key, required this.product}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var orderStatus = widget.order['status'] ?? 'Pending';
+    var productName = product['productName'] ?? 'Unknown';
+    var quantity = product['quantity'] ?? 0;
+    var paymentMethod = product['paymentMethod'] ?? 'Unknown';
+    var status = product['status'] ?? 'Unknown';
 
     return Card(
       margin: EdgeInsets.all(8.0),
       child: ListTile(
-        title: Text('Order Status: $orderStatus'),
+        leading: Image.network(
+          product['productImg'],
+          width: 50, // Set the desired width of the image
+          height: 50, // Set the desired height of the image
+          fit: BoxFit.cover, // Choose the appropriate BoxFit
+        ),
+        title: Text('Product Name: $productName'),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (products != null)
-              for (var product in products!)
-                Text('Product Name: ${product['productName']}'),
+            Text('Quantity: $quantity'),
+            Text('Payment Method: $paymentMethod'),
             // Add other product details as needed
           ],
         ),

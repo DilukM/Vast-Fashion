@@ -62,6 +62,10 @@ class _EditProductFormState extends State<EditProductForm> {
             ),
             const SizedBox(height: 16),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Color.fromARGB(255, 5, 129, 44),
+              ),
               onPressed: () {
                 _updateProduct(widget.ID); // Pass the product ID
               },

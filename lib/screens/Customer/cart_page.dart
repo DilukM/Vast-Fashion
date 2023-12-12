@@ -6,6 +6,7 @@ import 'package:admin/screens/Customer/shipping_details.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:badges/badges.dart' as badges;
 
 class CartPage extends StatelessWidget {
   @override
@@ -13,6 +14,7 @@ class CartPage extends StatelessWidget {
     // Get the current user ID
     String? userId = getCurrentUserId();
 
+    var cartItemCount = 0;
     return Scaffold(
       appBar: AppBar(
         title: Text('Shopping Cart'),
@@ -57,20 +59,25 @@ class CartPage extends StatelessWidget {
                 );
               },
             ),
-            IconButton(
-              icon: const Icon(
-                Icons.shopping_cart,
-                color: Color.fromARGB(255, 12, 113, 51),
+            badges.Badge(
+              position: badges.BadgePosition.topEnd(top: 0, end: 3),
+              badgeContent: Text(
+                cartItemCount.toString(),
+                style: TextStyle(color: Colors.white),
               ),
-              onPressed: () {
-                // Navigate to cart page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CartPage(),
-                  ),
-                );
-              },
+              child: IconButton(
+                icon: const Icon(Icons.shopping_cart,
+                    color: Color.fromARGB(255, 12, 113, 51)),
+                onPressed: () {
+                  // Navigate to cart page
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CartPage(),
+                    ),
+                  );
+                },
+              ),
             ),
             IconButton(
               icon: const Icon(
@@ -129,6 +136,12 @@ class CartItemList extends StatelessWidget {
           totalCost += data['price'] * data['quantity'];
 
           return ListTile(
+            leading: Image.network(
+              data['imageUrl'],
+              width: 50, // Set the desired width of the image
+              height: 50, // Set the desired height of the image
+              fit: BoxFit.cover, // Choose the appropriate BoxFit
+            ),
             title: Text(data['name']),
             subtitle: Text('Quantity: ${data['quantity']}'),
             trailing: Row(

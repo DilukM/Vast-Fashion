@@ -131,6 +131,10 @@ class _AddProductFormState extends State<AddProductForm> {
             ),
             const SizedBox(height: 16),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Color.fromARGB(255, 5, 129, 44),
+              ),
               onPressed: () {
                 _addProduct();
               },

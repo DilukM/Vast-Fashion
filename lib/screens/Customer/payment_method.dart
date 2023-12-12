@@ -1,9 +1,14 @@
+import 'package:admin/screens/Customer/account_page.dart';
+import 'package:admin/screens/Customer/cart_page.dart';
+import 'package:admin/screens/Customer/home_screen.dart';
+import 'package:admin/screens/Customer/order_page.dart';
 import 'package:admin/screens/Customer/thankyou.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:badges/badges.dart' as badges;
 
 class PaymentPage extends StatefulWidget {
   final String userId;
@@ -31,9 +36,83 @@ class _PaymentPageState extends State<PaymentPage> {
 
   @override
   Widget build(BuildContext context) {
+    var cartItemCount = 0;
     return Scaffold(
       appBar: AppBar(
         title: Text('Choose Payment Method'),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        shape: const CircularNotchedRectangle(),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            IconButton(
+              icon: const Icon(
+                Icons.home,
+                color: Color.fromARGB(255, 12, 113, 51),
+              ),
+              onPressed: () {
+                // Navigate to home
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HomePage(),
+                  ),
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.assignment,
+                color: Color.fromARGB(255, 12, 113, 51),
+              ),
+              onPressed: () {
+                // Navigate to orders
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => OrderPage(),
+                  ),
+                );
+              },
+            ),
+            badges.Badge(
+              position: badges.BadgePosition.topEnd(top: 0, end: 3),
+              badgeContent: Text(
+                cartItemCount.toString(),
+                style: TextStyle(color: Colors.white),
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.shopping_cart,
+                    color: Color.fromARGB(255, 12, 113, 51)),
+                onPressed: () {
+                  // Navigate to cart page
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CartPage(),
+                    ),
+                  );
+                },
+              ),
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.account_circle,
+                color: Color.fromARGB(255, 12, 113, 51),
+              ),
+              onPressed: () {
+                // Navigate to account
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AccountPage(),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
       body: SingleChildScrollView(
           child: Padding(
@@ -54,6 +133,10 @@ class _PaymentPageState extends State<PaymentPage> {
               buildFileUploadField(),
             SizedBox(height: 16),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Color.fromARGB(255, 5, 129, 44),
+              ),
               onPressed: () {
                 // Validate and process the selected payment method
                 if (validatePayment()) {
@@ -156,19 +239,6 @@ class _PaymentPageState extends State<PaymentPage> {
         String street = shippingDetailsSnapshot['street'];
         String zip = shippingDetailsSnapshot['zip'];
 
-        await FirebaseFirestore.instance.collection('orders').doc(userId).set({
-          'userId': userId,
-          'status': 'pending',
-          'shippingDetails': {
-            'city': city,
-            'contactName': contactName,
-            'house': house,
-            'phoneNumber': phoneNumber,
-            'street': street,
-            'zip': zip,
-          },
-        });
-
         // Fetch cart items from Firestore
         QuerySnapshot cartSnapshot = await FirebaseFirestore.instance
             .collection('users')
@@ -180,7 +250,9 @@ class _PaymentPageState extends State<PaymentPage> {
           // Process each cart item as an order
           for (DocumentSnapshot cartItem in cartSnapshot.docs) {
             String productName = cartItem['name'];
+            String productImg = cartItem['imageUrl'];
             int quantity = cartItem['quantity'];
+            double price = cartItem['price'];
             String paymentMethod = selectedPaymentMethod;
             String fileUrl = ''; // default value for non-online transaction
 
@@ -213,26 +285,38 @@ class _PaymentPageState extends State<PaymentPage> {
               String fileUrl = await uploadFile();
 
               // Save order details to Firestore
-              await FirebaseFirestore.instance
-                  .collection('orders')
-                  .doc(userId)
-                  .collection('products')
-                  .add({
+              await FirebaseFirestore.instance.collection('orders').add({
+                'userId': userId,
+                'city': city,
+                'contactName': contactName,
+                'house': house,
+                'phoneNumber': phoneNumber,
+                'street': street,
+                'zip': zip,
+                'status': 'pending',
+                'productImg': productImg,
                 'productName': productName,
                 'quantity': quantity,
                 'paymentMethod': paymentMethod,
+                'total': price * quantity,
                 'fileUrl': fileUrl, // Save the download URL in the database
                 // Add other details as needed
               });
             } else {
               // Save order details to Firestore for non-online transaction
-              await FirebaseFirestore.instance
-                  .collection('orders')
-                  .doc(userId)
-                  .collection('products')
-                  .add({
+              await FirebaseFirestore.instance.collection('orders').add({
+                'userId': userId,
+                'city': city,
+                'contactName': contactName,
+                'house': house,
+                'phoneNumber': phoneNumber,
+                'street': street,
+                'zip': zip,
+                'status': 'pending',
+                'productImg': productImg,
                 'productName': productName,
                 'quantity': quantity,
+                'total': price * quantity,
                 'paymentMethod': paymentMethod,
                 // Add other details as needed
               });
@@ -310,6 +394,10 @@ class _PaymentPageState extends State<PaymentPage> {
 
   Widget buildPayPalSignInButton() {
     return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white,
+        backgroundColor: Color.fromARGB(255, 5, 129, 44),
+      ),
       onPressed: () {
         // Implement PayPal sign-in logic
         print('Signing in to PayPal...');
@@ -323,6 +411,10 @@ class _PaymentPageState extends State<PaymentPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Color.fromARGB(255, 5, 129, 44),
+          ),
           onPressed: () async {
             // Open the file picker
             FilePickerResult? result = await FilePicker.platform.pickFiles();

@@ -41,19 +41,13 @@ class _SignInScreenState extends State<SignInScreen> {
                 20, MediaQuery.of(context).size.height * 0.2, 20, 0),
             child: Column(
               children: <Widget>[
-                const SizedBox(
-                  height: 30,
-                ),
+                const SizedBox(height: 30),
                 reusableTextField("Enter Email", Icons.person_outline, false,
                     _emailTextController),
-                const SizedBox(
-                  height: 30,
-                ),
+                const SizedBox(height: 30),
                 reusableTextField("Enter Password", Icons.lock_outline, true,
                     _passwordTextController),
-                const SizedBox(
-                  height: 30,
-                ),
+                const SizedBox(height: 30),
                 forgetPassword(context),
                 signInSignUpButton(context, true, () {
                   FirebaseAuth.instance

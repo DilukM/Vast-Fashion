@@ -5,6 +5,7 @@ import 'package:admin/screens/Customer/order_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:badges/badges.dart' as badges;
 
 class ProductPage extends StatefulWidget {
   final String productId;
@@ -57,6 +58,7 @@ class _ProductPageState extends State<ProductPage> {
 
   @override
   Widget build(BuildContext context) {
+    var cartItemCount = 0;
     return WillPopScope(
       onWillPop: () async {
         // Handle back button press, e.g., return true to allow back navigation
@@ -69,7 +71,7 @@ class _ProductPageState extends State<ProductPage> {
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Center(
                 child: productImageUrl != null
@@ -137,6 +139,10 @@ class _ProductPageState extends State<ProductPage> {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Color.fromARGB(255, 5, 129, 44),
+                ),
                 onPressed: () {
                   // Add the product to the cart
                   addToCart();
@@ -153,6 +159,7 @@ class _ProductPageState extends State<ProductPage> {
             children: [
               IconButton(
                 icon: const Icon(Icons.home),
+                color: Color.fromARGB(255, 12, 113, 51),
                 onPressed: () {
                   // Navigate to home
                   Navigator.push(
@@ -165,6 +172,7 @@ class _ProductPageState extends State<ProductPage> {
               ),
               IconButton(
                 icon: const Icon(Icons.assignment),
+                color: Color.fromARGB(255, 12, 113, 51),
                 onPressed: () {
                   // Navigate to orders
                   Navigator.push(
@@ -175,20 +183,29 @@ class _ProductPageState extends State<ProductPage> {
                   );
                 },
               ),
-              IconButton(
-                icon: const Icon(Icons.shopping_cart),
-                onPressed: () {
-                  // Navigate to cart page
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CartPage(),
-                    ),
-                  );
-                },
+              badges.Badge(
+                position: badges.BadgePosition.topEnd(top: 0, end: 3),
+                badgeContent: Text(
+                  cartItemCount.toString(),
+                  style: TextStyle(color: Colors.white),
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.shopping_cart,
+                      color: Color.fromARGB(255, 12, 113, 51)),
+                  onPressed: () {
+                    // Navigate to cart page
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CartPage(),
+                      ),
+                    );
+                  },
+                ),
               ),
               IconButton(
                 icon: const Icon(Icons.account_circle),
+                color: Color.fromARGB(255, 12, 113, 51),
                 onPressed: () {
                   // Navigate to account
                   Navigator.push(
